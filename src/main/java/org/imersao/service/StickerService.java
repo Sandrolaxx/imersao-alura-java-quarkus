@@ -3,6 +3,7 @@ package org.imersao.service;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class StickerService {
 
         int width = originalImg.getWidth();
         int height = originalImg.getHeight();
-        int newHeight = height + 200;
+        int newHeight = height + 140;
 
         var newImg = new BufferedImage(width, newHeight, BufferedImage.TRANSLUCENT);
 
@@ -35,15 +36,48 @@ public class StickerService {
 
         graphics2D.drawImage(originalImg, 0, 0, null);
 
-        graphics2D.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30));
+        graphics2D.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 64));
         graphics2D.setColor(Color.CYAN);
-        graphics2D.drawString(dto.getImageText(), 0, newHeight - 120);
+        graphics2D.drawString(dto.getImageText(), getTextCenterSize(dto.getImageText()), dto.isTextInsideImage() ? 0 : newHeight - 50);
 
         var btArrayOutputStram =  new ByteArrayOutputStream();
-        ImageIO.write(newImg, "png", btArrayOutputStram);
+        ImageIO.write(getFinalImage(newImg, dto), "png", btArrayOutputStram);
 
         return btArrayOutputStram.toByteArray();
 
+    }
+
+    private BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) throws IOException {
+        var resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);
+        var outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TRANSLUCENT);
+        
+        outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
+
+        return outputImage;
+    }
+
+    private BufferedImage getFinalImage(BufferedImage image, StickerDto dto) throws IOException {
+        return dto.isOriginaLSize() ? image : resizeImage(image, 200, 200);
+    }
+
+    private int getTextCenterSize(String imageText) {
+        Integer imageLength = imageText.length();
+
+        if (imageLength <= 3) {
+            return 352;
+        } else if (imageLength <= 6) {
+            return 302;
+        } else if (imageLength <= 8) {
+            return 232;
+        } else if (imageLength <= 10) {
+            return 182;
+        } else if (imageLength <= 12) {
+            return 162;
+        } else if (imageLength <= 16) {
+            return 124;
+        } else {
+            return 6;
+        }
     }
 
 }

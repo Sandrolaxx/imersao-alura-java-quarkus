@@ -6,6 +6,10 @@ public class StickerDto {
 
     private String imageText;
 
+    private boolean textInsideImage;
+
+    private boolean originaLSize;
+
     public String getImagePath() {
         return imagePath;
     }
@@ -20,6 +24,22 @@ public class StickerDto {
 
     public void setImageText(String imageText) {
         this.imageText = imageText;
+    }
+
+    public boolean isTextInsideImage() {
+        return textInsideImage;
+    }
+
+    public void setTextInsideImage(boolean textInsideImage) {
+        this.textInsideImage = textInsideImage;
+    }
+
+    public boolean isOriginaLSize() {
+        return originaLSize;
+    }
+
+    public void setOriginaLSize(boolean originaLSize) {
+        this.originaLSize = originaLSize;
     }
 
 }
