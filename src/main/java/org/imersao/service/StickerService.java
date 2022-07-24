@@ -13,6 +13,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.imageio.ImageIO;
 
 import org.imersao.dto.StickerDto;
+import org.imersao.utils.StickerException;
 
 /**
  *
@@ -21,29 +22,33 @@ import org.imersao.dto.StickerDto;
 @ApplicationScoped
 public class StickerService {
 
-    public byte[] handleCreate(StickerDto dto) throws IOException {
+    public byte[] handleCreate(StickerDto dto) {
 
-        var inputStream = new URL(dto.getImagePath()).openStream();
-        var originalImg = ImageIO.read(inputStream);
-
-        int width = originalImg.getWidth();
-        int height = originalImg.getHeight();
-        int newHeight = height + 140;
-
-        var newImg = new BufferedImage(width, newHeight, BufferedImage.TRANSLUCENT);
-
-        var graphics2D = (Graphics2D) newImg.getGraphics();
-
-        graphics2D.drawImage(originalImg, 0, 0, null);
-
-        graphics2D.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 64));
-        graphics2D.setColor(Color.CYAN);
-        graphics2D.drawString(dto.getImageText(), getTextCenterSize(dto.getImageText()), dto.isTextInsideImage() ? 0 : newHeight - 50);
-
-        var btArrayOutputStram =  new ByteArrayOutputStream();
-        ImageIO.write(getFinalImage(newImg, dto), "png", btArrayOutputStram);
-
-        return btArrayOutputStram.toByteArray();
+        try {
+            var inputStream = new URL(dto.getImagePath()).openStream();
+            var originalImg = ImageIO.read(inputStream);
+    
+            int width = originalImg.getWidth();
+            int height = originalImg.getHeight();
+            int newHeight = dto.isTextInsideImage() ? height : height + 140;
+    
+            var newImg = new BufferedImage(width, newHeight, BufferedImage.TRANSLUCENT);
+    
+            var graphics2D = (Graphics2D) newImg.getGraphics();
+    
+            graphics2D.drawImage(originalImg, 0, 0, null);
+    
+            graphics2D.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 82));
+            graphics2D.setColor(Color.YELLOW);
+            graphics2D.drawString(dto.getImageText(), getTextCenterSize(dto.getImageText()), newHeight - 40);
+    
+            var btArrayOutputStram =  new ByteArrayOutputStream();
+            ImageIO.write(getFinalImage(newImg, dto), "png", btArrayOutputStram);
+    
+            return btArrayOutputStram.toByteArray();
+        } catch (Exception e) {
+            throw new StickerException("Erro ao gerar sticker", 500);
+        }
 
     }
 
@@ -57,26 +62,24 @@ public class StickerService {
     }
 
     private BufferedImage getFinalImage(BufferedImage image, StickerDto dto) throws IOException {
-        return dto.isOriginaLSize() ? image : resizeImage(image, 200, 200);
+        return dto.isOriginalSize() ? image : resizeImage(image, 200, 200);
     }
 
     private int getTextCenterSize(String imageText) {
         Integer imageLength = imageText.length();
 
         if (imageLength <= 3) {
-            return 352;
+            return 322;
         } else if (imageLength <= 6) {
-            return 302;
+            return 262;
         } else if (imageLength <= 8) {
-            return 232;
+            return 202;
         } else if (imageLength <= 10) {
-            return 182;
+            return 142;
         } else if (imageLength <= 12) {
-            return 162;
-        } else if (imageLength <= 16) {
-            return 124;
+            return 122;
         } else {
-            return 6;
+            return 12;
         }
     }
 

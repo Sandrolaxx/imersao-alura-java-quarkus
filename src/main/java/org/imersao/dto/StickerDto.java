@@ -8,7 +8,7 @@ public class StickerDto {
 
     private boolean textInsideImage;
 
-    private boolean originaLSize;
+    private boolean originalSize;
 
     public String getImagePath() {
         return imagePath;
@@ -34,12 +34,12 @@ public class StickerDto {
         this.textInsideImage = textInsideImage;
     }
 
-    public boolean isOriginaLSize() {
-        return originaLSize;
+    public boolean isOriginalSize() {
+        return originalSize;
     }
 
-    public void setOriginaLSize(boolean originaLSize) {
-        this.originaLSize = originaLSize;
+    public void setOriginalSize(boolean originalSize) {
+        this.originalSize = originalSize;
     }
-
+    
 }
