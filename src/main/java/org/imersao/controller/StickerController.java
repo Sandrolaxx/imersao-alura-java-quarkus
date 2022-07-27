@@ -28,7 +28,6 @@ public class StickerController {
     @Path("/image")
     @Consumes("application/json")
     public byte[] generate(StickerDto stickerDto, @HeaderParam("Authorization") String token) throws Exception {
-
         ValidationUtil.validateData(stickerDto);
         ValidationUtil.validateToken(token, API_TOKEN);
 
