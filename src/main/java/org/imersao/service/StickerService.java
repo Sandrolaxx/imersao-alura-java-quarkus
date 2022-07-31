@@ -27,24 +27,27 @@ public class StickerService {
         try {
             var inputStream = new URL(dto.getImagePath()).openStream();
             var originalImg = ImageIO.read(inputStream);
-    
+
             int width = originalImg.getWidth();
             int height = originalImg.getHeight();
-            int newHeight = dto.isTextInsideImage() ? height : height + 140;
-    
+            int newHeight = dto.isTextInsideImage() ? height : height + 92;
+
             var newImg = new BufferedImage(width, newHeight, BufferedImage.TRANSLUCENT);
-    
+
             var graphics2D = (Graphics2D) newImg.getGraphics();
-    
+
             graphics2D.drawImage(originalImg, 0, 0, null);
-    
-            graphics2D.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 82));
+
+            graphics2D.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 52));
             graphics2D.setColor(Color.YELLOW);
-            graphics2D.drawString(dto.getImageText(), getTextCenterSize(dto.getImageText()), newHeight - 40);
-    
-            var btArrayOutputStram =  new ByteArrayOutputStream();
+
+            if (!dto.getImageText().isEmpty()) {
+                setTextCenter(graphics2D, dto.getImageText(), newImg, newHeight - 40);
+            }
+
+            var btArrayOutputStram = new ByteArrayOutputStream();
             ImageIO.write(getFinalImage(newImg, dto), "png", btArrayOutputStram);
-    
+
             return btArrayOutputStram.toByteArray();
         } catch (Exception e) {
             throw new StickerException("Erro ao gerar sticker", 500);
@@ -52,35 +55,30 @@ public class StickerService {
 
     }
 
-    private BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) throws IOException {
+    private BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight)
+            throws IOException {
         var resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);
         var outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TRANSLUCENT);
-        
+
         outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
 
         return outputImage;
     }
 
     private BufferedImage getFinalImage(BufferedImage image, StickerDto dto) throws IOException {
-        return dto.isOriginalSize() ? image : resizeImage(image, 200, 200);
+        return dto.isOriginalSize() ? image : resizeImage(image, 260, 300);
     }
 
-    private int getTextCenterSize(String imageText) {
-        Integer imageLength = imageText.length();
+    private Graphics2D setTextCenter(Graphics2D graphics2DImage, String string,
+            BufferedImage bgImage, int textVerticalLocation) {
+        int stringWidthLength = (int) graphics2DImage.getFontMetrics().getStringBounds(string, graphics2DImage)
+                .getWidth();
 
-        if (imageLength <= 3) {
-            return 322;
-        } else if (imageLength <= 6) {
-            return 262;
-        } else if (imageLength <= 8) {
-            return 202;
-        } else if (imageLength <= 10) {
-            return 142;
-        } else if (imageLength <= 12) {
-            return 122;
-        } else {
-            return 12;
-        }
+        int horizontalCenter = bgImage.getWidth() / 2 - stringWidthLength / 2;
+
+        graphics2DImage.drawString(string, horizontalCenter, textVerticalLocation);
+
+        return graphics2DImage;
     }
 
 }
